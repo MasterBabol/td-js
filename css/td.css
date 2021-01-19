@@ -23,6 +23,7 @@
 
 .td-signal-name {
     margin: 0 var(--space-between-signals) 0 auto;
+    text-align: right;
 }
 
 .td-signal-content {

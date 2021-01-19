@@ -24,6 +24,11 @@
             font-size: 12px;
         }
 
+        .draw-tgt-container {
+            width: 960px;
+            overflow: auto;
+        }
+
         #draw-src {
             border: 0.5px solid gray;
             margin: 12px;
@@ -83,11 +88,25 @@
             let src = document.querySelector('#draw-src');
             let tgt = document.querySelector('#draw-tgt');
 
-            src.innerHTML = JSON.stringify(sampleObject, null, 2);
-            TdRender(tgt, sampleObject);
+            src.value = JSON.stringify(sampleObject, null, 2);
+            update();
         });
+        function update() {
+            let src = document.querySelector('#draw-src');
+            let tgt = document.querySelector('#draw-tgt');
+
+            obj = JSON.parse(src.value);
+            TdRender(tgt, obj);
+        }
+        function changeWidth(value) {
+            let root = document.documentElement;
+            root.style.setProperty('--cycle-width', value + 'px');
+        }
     </script>
-    <div id='draw-tgt'></div>
-    <code id='draw-src'></code>
+    <input type="range" value="1" min="1" max="100" oninput="changeWidth(this.value)" onchange="changeWidth(this.value)" />
+    <div class="draw-tgt-container">
+        <div id='draw-tgt'></div>
+    </div>
+    <textarea id='draw-src' cols="80" rows="50" oninput="update()"></textarea>
 </body>
 </html>

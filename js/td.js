@@ -1,6 +1,7 @@
 
 function TdRender(targetDom, tdObject) {
     targetDom.classList.add('td-container');
+    targetDom.innerHTML = '';
 
     let signals = tdObject.signals;
     let signalContainers = [];
