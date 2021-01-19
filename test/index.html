@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/td.css" />
+    <style type="text/css">
+        @import '../css/reset.css';
+        @import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@4/distr/fira_code.css);
+        body {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        code {
+            padding: 8px;
+            white-space: pre;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+        }
+
+        #draw-src {
+            border: 0.5px solid gray;
+            margin: 12px;
+        }
+
+        #draw-tgt {
+            border: 0.5px solid gray;
+            margin: 12px;
+        }
+    </style>
+    <script type="text/javascript" src="../js/td.js"></script>
+</head>
+<body>
+    <script>
+        var sampleObject = {
+            signals: [{
+                    name: 'Name',
+                    type: 'clock',
+                },
+                {
+                    name: 'Long Name',
+                    type: 'clock',
+                    unit: 0.5,
+                },
+                {
+                    name: 'Some Name',
+                    type: 'clock',
+                    unit: 3,
+                },
+                {
+                    name: 'Very Name',
+                    type: 'clock',
+                    unit: 1/3,
+                },
+                {
+                    name: 'Just Name',
+                    type: 'clock',
+                    unit: 2,
+                },
+                {
+                    name: 'Very Long Name',
+                    type: 'data',
+                    unit: 0.5,
+                    data: 'd2d4d1zd2hlh2l2d2l2h2d2h4l2d2x2hzlzh',
+                    labels: [
+                        'AAAA',
+                        'B',
+                        'C',
+                        'D',
+                        'E',
+                        'F',
+                        'G',
+                    ]
+                }]
+        };
+        document.addEventListener("DOMContentLoaded", function(event) {
+            let src = document.querySelector('#draw-src');
+            let tgt = document.querySelector('#draw-tgt');
+
+            src.innerHTML = JSON.stringify(sampleObject, null, 2);
+            TdRender(tgt, sampleObject);
+        });
+    </script>
+    <div id='draw-tgt'></div>
+    <code id='draw-src'></code>
+</body>
+</html>
