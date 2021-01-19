@@ -63,6 +63,7 @@
 
 .td-signal-clk-wrapper {
     width: calc(var(--unit-width) * var(--cycle-width));
+    height: var(--cycle-height);
     display: inline-block;
     overflow: hidden;
 }
