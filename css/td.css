@@ -8,6 +8,7 @@
 }
 
 .td-container {
+    position: relative;
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
@@ -80,6 +81,7 @@
 
 .td-signal-data {
     display: inline-flex;
+    background-color: white;
     justify-content: center;
     align-items: center;
     border: var(--border-weight) solid black;
@@ -171,4 +173,31 @@
 .td-signal-smooth-before {
     border-top-right-radius: calc(var(--cycle-height) / 4) calc(var(--cycle-height) / 2);
     border-bottom-right-radius: calc(var(--cycle-height) / 4) calc(var(--cycle-height) / 2);
+}
+
+.td-grid-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-evenly;
+    padding: var(--space-between-signals);
+}
+
+.td-grid {
+    box-sizing: border-box;
+    width: 0;
+    height: 100%;
+    margin-left: calc(var(--cycle-width) - var(--border-weight));
+    border-left: var(--border-weight) dashed gray;
+    z-index: -1;
+}
+
+.td-grid:first-of-type {
+    margin-left: auto;
+}
+
+.td-grid:last-of-type {
+    margin-right: calc(var(--cycle-width) * var(--signal-width));
 }

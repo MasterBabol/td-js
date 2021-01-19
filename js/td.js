@@ -113,6 +113,19 @@ function TdRender(targetDom, tdObject) {
         targetDom.appendChild(signalContainer);
     }
 
+    let gridContainer = document.createElement('div');
+    gridContainer.classList.add('td-grid-container');
+
+    for (let i = 0; i < maximumWidth; i++) {
+        let newGrid = document.createElement('div');
+        newGrid.classList.add('td-grid');
+        if (i + 1 >= maximumWidth)
+            newGrid.style.setProperty('--signal-width', maximumWidth % 1);
+        gridContainer.appendChild(newGrid);
+    }
+
+    targetDom.appendChild(gridContainer);
+
     TdAdjustStyles(targetDom);
 }
 
