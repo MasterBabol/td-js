@@ -6,7 +6,7 @@ function TdRender(targetDom, tdObject) {
     let signals = tdObject.signals;
     let signalContainers = [];
         
-    let datRegexPat = /(\w)([1-9]\d*)?/g;
+    let datRegexPat = /\s*([dhlzx])\s*([1-9]\d*)?\s*/g;
 
     let maximumWidth = 0;
 
