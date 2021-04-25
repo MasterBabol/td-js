@@ -43,6 +43,8 @@ TdRender(tgt, obj);
 
 ![image](https://user-images.githubusercontent.com/17945273/115991360-e52cdc80-a602-11eb-82a0-4c37c3514ca3.png)
 
+Cycle width, height, border weight, and vertical margin between signals are user-configurable by modifying css variables of td.css:root statically (td.css) or dynamically (e.g. document.documentElement.style.setProperty('--cycle-width', '12px')).
+
 ## Web example
 
 Refer to the example page: [jsfiddle](https://jsfiddle.net/e4sz81g5/3/)
