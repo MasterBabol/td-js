@@ -1,4 +1,124 @@
 
+function Td(targetDom, config) {
+    this.targetDom = targetDom;
+    this.targetDom.classList.add('td-container');
+
+    this.addSignal = (name, unit, width) => {
+        let signalNameCollInput = document.createElement('input');
+        signalNameCollInput.setAttribute('type', 'checkbox');
+        signalNameCollInput.classList.add('td-signal-name-input');
+        signalNameCollInput.setAttribute('id', 'td-signal-name-input-' + name);
+
+        let signalNameLabel = document.createElement('label');
+        signalNameLabel.classList.add('td-signal-name');
+        signalNameLabel.setAttribute('for', 'td-signal-name-input-' + name);
+        signalNameLabel.innerHTML = `${name} [${width - 1}:0]`;
+                
+        let signalContent = document.createElement('div');
+        signalContent.classList.add('td-signal-content');
+
+        let signalContainer = document.createElement('div');
+        signalContainer.classList.add('td-signal-container');
+        signalContainer.appendChild(signalNameLabel);
+        signalContainer.appendChild(signalContent);
+
+        this.targetDom.appendChild(signalNameCollInput);
+        this.targetDom.appendChild(signalContainer);
+        
+        let childrenContents = []
+
+        if (width > 0) {
+            let signalChildrenContainer = document.createElement('div');
+            signalChildrenContainer.classList.add('td-signal-child-container');
+
+            for (let childId = 0; childId < width; childId++) {
+                let childSignalName = `[${childId}]`;
+
+                let signalNameLabel = document.createElement('label');
+                signalNameLabel.classList.add('td-signal-name');
+                signalNameLabel.innerHTML = childSignalName;
+                
+                let signalContent = document.createElement('div');
+                signalContent.classList.add('td-signal-content');
+                
+                let signalContainer = document.createElement('div');
+                signalContainer.classList.add('td-signal-container');
+                signalContainer.appendChild(signalNameLabel);
+                signalContainer.appendChild(signalContent);
+    
+                signalChildrenContainer.appendChild(signalContainer);
+
+                childrenContents.push(signalContent);
+            }
+        
+            this.targetDom.appendChild(signalChildrenContainer);
+        }
+
+        let signalInfo = {
+            name: name,
+            unit: unit,
+            width: width,
+            doms: {
+                container: signalContent,
+                children: childrenContents
+            },
+            addData: (inputs) => {
+                let dataArray = Array.isArray(inputs)?inputs:[inputs];
+                
+                for (let data of dataArray) {
+                    let signalDataElem = makeSignalDataElem(data);
+                    signalInfo.doms.container.appendChild(signalDataElem);
+    
+                    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
+                    let childrenData = data.split('').reverse();
+                    for (let child of zip(signalInfo.doms.children, childrenData)) {
+                        child[0].appendChild(makeSignalDataElem(child[1]));
+                    }
+                }
+
+                TdAdjustStyles(this.targetDom);
+            }
+        };
+
+        return signalInfo;
+    };
+}
+
+function makeSignalDataElem(data) {
+    let dataElem = document.createElement('div');
+    dataElem.classList.add('td-signal');
+
+    if (data.length <= 1) {
+        switch (data) {
+            case '0':
+                dataElem.classList.add('td-signal-low');
+                break;
+            case '1':
+                dataElem.classList.add('td-signal-high');
+                break;
+            case 'z':
+                dataElem.classList.add('td-signal-highz');
+                break;
+            case 'x':
+                dataElem.classList.add('td-signal-data');
+                dataElem.classList.add('td-signal-data-dontcare');
+                let dataTextElem = document.createElement('span');
+                dataTextElem.classList.add('td-signal-data-text');
+                dataTextElem.innerHTML = 'x';
+                dataElem.appendChild(dataTextElem);
+                break;
+        }
+    } else {
+        dataElem.classList.add('td-signal-data');
+        let dataTextElem = document.createElement('span');
+        dataTextElem.classList.add('td-signal-data-text');
+        dataTextElem.innerHTML = data;
+        dataElem.appendChild(dataTextElem);
+    }
+
+    return dataElem;
+}
+
 function TdRender(targetDom, tdObject) {
     targetDom.classList.add('td-container');
     targetDom.innerHTML = '';
@@ -134,6 +254,7 @@ function TdAdjustStyles(targetDom) {
     let td_signal_contents = targetDom.querySelectorAll('.td-signal-content');
     for (let td_signal_content of td_signal_contents) {
         let td_signals = td_signal_content.querySelectorAll('.td-signal');
+        console.log(td_signals)
         for (let [idx, td_signal] of td_signals.entries()) {
             if (idx > 0) {
                 if (td_signals[idx - 1].classList.contains('td-signal-data') ||

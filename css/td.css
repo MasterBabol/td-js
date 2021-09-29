@@ -21,9 +21,26 @@
     margin: var(--space-between-signals);
 }
 
+.td-signal-child-container {
+    display: none;
+    justify-content: space-evenly;
+    flex-direction: column;
+    margin: 0;
+}
+
 .td-signal-name {
     margin: 0 var(--space-between-signals) 0 auto;
     text-align: right;
+}
+
+.td-signal-name-input {
+    display: none;
+}
+
+.td-signal-name-input:checked +
+.td-signal-container +
+.td-signal-child-container {
+    display: flex;
 }
 
 .td-signal-content {
