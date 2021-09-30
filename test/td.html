@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../css/td.css" />
+    <link rel="stylesheet" href="../css/td.ui.css" />
+    <link rel="stylesheet" href="../css/td.elem.css" />
     <style type="text/css">
         @import '../css/reset.css';
         @import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@4/distr/fira_code.css);
@@ -24,42 +25,56 @@
             font-size: 12px;
         }
 
-        .draw-tgt-container {
-            width: 960px;
-            overflow: auto;
-        }
-
-        #draw-src {
-            border: 0.5px solid gray;
-            margin: 12px;
-        }
-
-        #draw-tgt {
-            border: 0.5px solid gray;
-            margin: 12px;
+        #draw-tgt-container {
+            width: 800px;
+            max-width: 800px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
         }
     </style>
     <script type="text/javascript" src="../js/td.js"></script>
 </head>
 <body>
     <script>
+        let td = null;
         document.addEventListener("DOMContentLoaded", function(event) {
-            let tgt = document.querySelector('#draw-tgt');
+            let tgt = document.querySelector('#draw-tgt-container');
 
-            let td = new Td(tgt, {});
+            td = new Td(tgt, {});
             
-            let sn = td.addSignal('Short Name', 1, 3);
+            let sn = td.addSignal('Short Name', 1, 8);
             let sln = td.addSignal('Slightly Long Name', 1, 3);
             let n = td.addSignal('Name', 1, 0);
+            let an = td.addSignal('A Name', 1, 1);
 
-            sn.addData(['x10', '100', '111', '010']);
-            sln.addData(['011', '010', '111', '100']);
-            n.addData(['0', '1', '1', '0']);
+            td.addSignalData(['x1010100', '011', '0', '1']);
+            td.addSignalData([
+                ['10010101', '11101011', '01110010'],
+                ['010', '111', '100'],
+                ['1', '0', '1'],
+                ['1', '1', '0']
+            ]);
+            td.addSignalData([
+                ['10010101', '11101011', '01110010'],
+                ['010', '111', '100'],
+                ['1', '0', '1'],
+                ['1', '1', '0']
+            ]);
+            td.addSignalData([
+                ['10010101', '11101011', '01110010'],
+                ['010', '111', '100'],
+                ['1', '0', '1'],
+                ['1', '1', '0']
+            ]);
+
+            changeWidth(30);
         });
+        function changeWidth(value) {
+            td.changeUnitWidth(value);
+        }
     </script>
-    <input type="range" value="1" min="1" max="100" oninput="changeWidth(this.value)" onchange="changeWidth(this.value)" />
-    <div class="draw-tgt-container">
-        <div id='draw-tgt'></div>
-    </div>
+    <input type="range" value="30" min="30" max="200" oninput="changeWidth(this.value)" onchange="changeWidth(this.value)" />
+    <div id="draw-tgt-container"></div>
 </body>
 </html>
