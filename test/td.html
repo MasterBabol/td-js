@@ -41,22 +41,31 @@
         document.addEventListener("DOMContentLoaded", function(event) {
             let tgt = document.querySelector('#draw-tgt-container');
 
-            td = new Td(tgt, {});
-            
+            td = new Td(tgt, {
+                onCursorChange: (data) => {
+                    console.log(data);
+                }
+            });
+
             let sn = td.addSignal('Short Name', 1, 8);
             let sln = td.addSignal('Slightly Long Name', 1, 3);
             let n = td.addSignal('Name', 1, 0);
             let an = td.addSignal('A Name', 1, 1);
 
-            td.addSignalData(['x1010100', '011', '0', '1']);
             td.addSignalData([
-                ['10010101', '11101011', '01110010'],
+                'x1010100',
+                '011',
+                '0',
+                '1'
+            ]);
+            td.addSignalData([
+                ['10010101', '11101z11', '01110010'],
                 ['010', '111', '100'],
                 ['1', '0', '1'],
                 ['1', '1', '0']
             ]);
             td.addSignalData([
-                ['10010101', '11101011', '01110010'],
+                ['10010101', '1110z011', '01110010'],
                 ['010', '111', '100'],
                 ['1', '0', '1'],
                 ['1', '1', '0']

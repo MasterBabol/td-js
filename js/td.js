@@ -17,6 +17,11 @@ function Td(targetDom, config) {
     let signalContentsContainerWrapper = document.createElement('div');
     signalContentsContainerWrapper.classList.add('td-signal_contents_wrapper');
     signalContentsContainerWrapper.appendChild(signalContentsContainer);
+    signalContentsContainerWrapper.setAttribute('tabIndex', 0);
+
+    let cursor = document.createElement('div');
+    cursor.classList.add('td-cursor');
+    signalContentsContainerWrapper.appendChild(cursor);
 
     container.appendChild(signalNamesContainer);
     container.appendChild(signalContentsContainerWrapper);
@@ -31,19 +36,28 @@ function Td(targetDom, config) {
 
     this.data = {
         signalInfos: [],
+        maxDataUnit: 0,
+        dataCount: 0,
+        cursor: {
+            logicalPos: 0,
+            physicalPos: 0
+        }
     };
 
     this.config = {
+        minWidth: config?.minWidth ?? 30,
         width: config?.width ?? 30,
-        widthResizeUnit: config?.widthResizeUnit ?? 10
+        widthResizeUnit: config?.widthResizeUnit ?? 10,
+        onCursorChange: config?.onCursorChange
     };
 
     this.doms = {
+        topContainer: targetDom,
         namesContainer: signalNamesContainer,
         contentsContainer: signalContentsContainer
     };
 
-    this.addSignal = (name, unit, width) => {
+    this.addSignal = (name, unit, width, detailedName) => {
         let signalElems = makeSignalElems(name, width);
 
         this.doms.namesContainer.append(
@@ -53,6 +67,7 @@ function Td(targetDom, config) {
         );
         signalElems.nameOutline.classList.add('td-signal_name_outline');
         signalElems.nameDetail.classList.add('td-signal_name_detail');
+        signalElems.nameOutline.setAttribute('title', detailedName ?? name);
 
         this.doms.contentsContainer.append(
             signalElems.contentOutline,
@@ -83,32 +98,51 @@ function Td(targetDom, config) {
             }
         }
 
+        this.data.maxDataUnit = Math.max(this.data.maxDataUnit, unit);
+
         let signalInfo = {
             name: name,
             unit: unit,
             width: width,
             data: [],
+            viewData: [],
             doms: {
                 content: signalElems.contentOutline,
                 children: childrenContents
             },
             addData: (inputs, doAdjustUi = true) => {
                 let dataArray = Array.isArray(inputs)?inputs:[inputs];
-                
                 for (let data of dataArray) {
-                    let signalDataElem = makeSignalDataElem(data, width);
-                    signalDataElem.style.setProperty('--signal-width', signalInfo.unit);
-                    signalInfo.doms.content.appendChild(signalDataElem);
-    
-                    let childrenData = data.split('').reverse();
-                    for (let child of zip(signalInfo.doms.children, childrenData)) {
-                        let dataElem = makeSignalDataElem(child[1], 0);
-                        dataElem.style.setProperty('--signal-width', signalInfo.unit);
-                        child[0].appendChild(dataElem);
+                    if (signalInfo.data.length > 0 && (signalInfo.data[signalInfo.data.length - 1] == data)) {
+                        let lastItem = signalInfo.doms.content.children[signalInfo.doms.content.children.length - 1];
+                        let prevWidth = parseInt(lastItem.style.getPropertyValue('--signal-width'));
+                        if (isNaN(prevWidth))
+                            prevWidth = 1;
+                        lastItem.style.setProperty('--signal-width', (prevWidth + signalInfo.unit));
+
+                        for (let child of signalInfo.doms.children) {
+                            let childLastItem = child.children[child.children.length - 1];
+                            childLastItem.style.setProperty('--signal-width', (prevWidth + signalInfo.unit));
+                        }
+                    } else {
+                        let signalDataElem = makeSignalDataElem(data, width);
+                        signalDataElem.style.setProperty('--signal-width', signalInfo.unit);
+                        signalInfo.doms.content.appendChild(signalDataElem);
+        
+                        let childrenData = data.split('').reverse();
+                        for (let child of zip(signalInfo.doms.children, childrenData)) {
+                            let dataElem = makeSignalDataElem(child[1], 0);
+                            dataElem.style.setProperty('--signal-width', signalInfo.unit);
+                            child[0].appendChild(dataElem);
+                        }
+
+                        signalInfo.viewData.push(data);
                     }
+
+                    signalInfo.data.push(data);
                 }
 
-                signalInfo.data = signalInfo.data.concat(dataArray);
+                this.data.dataCount = Math.max(this.data.dataCount, signalInfo.data.length);
 
                 if (doAdjustUi)
                     this.adjustUi();
@@ -129,25 +163,89 @@ function Td(targetDom, config) {
             this.adjustUi();
     };
 
+    this.getSignalDataOnCursor = () => {
+        let unitIdx = Math.floor(this.data.cursor.logicalPos);
+        let result = []
+        for (let signalInfo of this.data.signalInfos) {
+            let targetIdx = Math.floor(unitIdx / signalInfo.unit);
+            result.push(signalInfo.data[targetIdx]);
+        }
+        return result;
+    };
+
+    this.getSignalDataCount = () => {
+        return this.data.dataCount;
+    };
+
     this.changeUnitWidth = (newWidth, doAdjustUi = true) => {
         this.config.width = parseInt(newWidth);
-        this.doms.contentsContainer.style.setProperty('--cycle-width', newWidth + 'px');
+        this.doms.topContainer.style.setProperty('--cycle-width', newWidth + 'px');
 
-        if (doAdjustUi)
+        if (doAdjustUi) {
             this.adjustUi();
+        }
     };
 
     this.adjustUi = () => {
         adjustStyles(this.doms.contentsContainer);
 
         for (let signalInfo of this.data.signalInfos) {
-            adjustSignalDataElemText(signalInfo.doms.content, signalInfo.data);
+            adjustSignalDataElemText(signalInfo.doms.content, signalInfo.viewData);
         }
+
+        this.adjustCursorPhysicalPosByLogicalPos();
+    };
+
+    this.adjustCursorPhysicalPosByLogicalPos = () => {
+        let wrapperOffset = parseInt(getComputedStyle(cursor).getPropertyValue('--space-between-signals'));
+        let cycleWidth = parseInt(getComputedStyle(cursor).getPropertyValue('--cycle-width'));
+        let logicalPos = this.data.cursor.logicalPos;
+        
+        this.data.cursor.physicalPos = logicalPos * cycleWidth + wrapperOffset;
+        cursor.style.setProperty('left', this.data.cursor.physicalPos + 'px');
+    };
+
+    this.setCursorPosByPx = (newPos) => {
+        let wrapperOffset = parseInt(getComputedStyle(cursor).getPropertyValue('--space-between-signals'));
+        let cycleWidth = parseInt(getComputedStyle(cursor).getPropertyValue('--cycle-width'));
+        let logicalPos = (newPos - wrapperOffset) / cycleWidth;
+
+        this.setCursorPos(logicalPos);
+    };
+
+    this.getCursorPos = () => {
+        return this.data.cursor.logicalPos;
+    };
+
+    this.setCursorPos = (newPos) => {
+        let dataCount = this.getSignalDataCount();
+        let filteredPos = Math.min(Math.max(newPos, 0), dataCount * this.data.maxDataUnit);
+
+        this.data.cursor.logicalPos = filteredPos;
+        this.adjustCursorPhysicalPosByLogicalPos();
+
+        this.config.onCursorChange?.(this.getSignalDataOnCursor());
     };
     
     this.changeUnitWidth(config.width, true);
 
+    signalContentsContainerWrapper.addEventListener('keydown', (ev) => {
+        switch (ev.key || ev.keyCode) {
+            case 'ArrowLeft': {
+                this.setCursorPos(Math.floor(this.getCursorPos() - 0.1));
+                break;
+            }
+            case 'ArrowRight': {
+                this.setCursorPos(Math.floor(this.getCursorPos() + 1));
+                break;
+            }
+        }
+    });
+
     signalContentsContainerWrapper.addEventListener('click', (ev) => {
+        let rect = ev.currentTarget.getBoundingClientRect();
+        let offsetX = ev.currentTarget.scrollLeft + ev.clientX - rect.left;
+        this.setCursorPosByPx(offsetX);
     });
 
     signalContentsContainerWrapper.addEventListener('mousewheel', (ev) => {
@@ -155,6 +253,9 @@ function Td(targetDom, config) {
         {
             ev.preventDefault();
             let delta = (ev.wheelDelta > 0?1:-1) * this.config.widthResizeUnit;
+
+            if (this.config.width + delta < this.config.minWidth)
+                return;
 
             let prevScroll = signalContentsContainerWrapper.scrollLeft;
             let prevWidth = signalContentsContainer.offsetWidth;
@@ -254,9 +355,19 @@ function makeSignalDataElem(data, width) {
         dataElem.classList.add('td-signal-data');
         let dataTextElem = document.createElement('span');
         dataTextElem.classList.add('td-signal-data-text');
-        dataTextElem.innerHTML = data;
+
+        dataTextElem.innerText = data;
         dataTextElem.setAttribute('title', data);
         dataElem.appendChild(dataTextElem);
+    }
+
+    if (data.includes('x')) {
+        dataElem.style.setProperty('background-color', 'var(--signal-data-dontcare-color)');
+        dataElem.style.setProperty('border-color', 'var(--signal-data-dontcare-border-color)');
+    }
+    else if (data.includes('z')) {
+        dataElem.style.setProperty('background-color', 'var(--signal-highz-color)');
+        dataElem.style.setProperty('border-color', 'var(--signal-highz-border-color)');
     }
 
     return dataElem;

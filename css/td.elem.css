@@ -2,8 +2,21 @@
 :root {
     --cycle-width: 48px;
     --cycle-height: 24px;
-    --border-weight: 1px;
-    --color-signal-data-dontcare: lightgray;
+    --border-weight: 2px;
+
+    --signal-color-default: #184621;
+    --signal-data-dontcare-color: #30181f;
+    --signal-highz-color: #34224e;
+    --signal-data-color: var(--signal-color-default);
+    --signal-general-color: var(--signal-color-default);
+    
+    --signal-border-color-default: #00e576;
+    --signal-data-dontcare-border-color: #ff0166;
+    --signal-highz-border-color: #333291;
+    --signal-data-border-color: var(--signal-border-color-default);
+    --signal-general-border-color: var(--signal-border-color-default);
+
+    --signal-data-text-weight: 500;
 }
 
 .td__collapsible_elem__input {
@@ -24,12 +37,13 @@
     width: calc(var(--signal-width, 1) * var(--cycle-width));
     height: var(--cycle-height);
     margin: 0;
+    font-weight: var(--signal-data-text-weight);
 }
 
 .td-signal-clk::before {
     display: block;
-    border-top: var(--border-weight) solid black;
-    border-left: var(--border-weight) solid black;
+    border-top: var(--border-weight) solid var(--signal-general-border-color);
+    border-left: var(--border-weight) solid var(--signal-general-border-color);
     width: 50%;
     height: calc(var(--cycle-height) - var(--border-weight));
     content: '';
@@ -49,8 +63,8 @@
 
 .td-signal-clk::after {
     display: block;
-    border-left: var(--border-weight) solid black;
-    border-bottom: var(--border-weight) solid black;
+    border-left: var(--border-weight) solid var(--signal-general-border-color);
+    border-bottom: var(--border-weight) solid var(--signal-general-border-color);
     width: 50%;
     height: calc(var(--cycle-height) - var(--border-weight));
     content: '';
@@ -58,10 +72,10 @@
 
 .td-signal-data {
     display: inline-flex;
-    background-color: white;
+    background-color: var(--signal-data-color);
     justify-content: center;
     align-items: center;
-    border: var(--border-weight) solid black;
+    border: var(--border-weight) solid var(--signal-data-border-color);
     border-top-left-radius: calc(var(--cycle-height) / 4) calc(var(--cycle-height) / 2);
     border-top-right-radius: calc(var(--cycle-height) / 4) calc(var(--cycle-height) / 2);
     border-bottom-left-radius: calc(var(--cycle-height) / 4) calc(var(--cycle-height) / 2);
@@ -74,11 +88,12 @@
 }
 
 .td-signal-data-dontcare {
-    background-color: var(--color-signal-data-dontcare);
+    background-color: var(--signal-data-dontcare-color);
+    border-color: var(--signal-data-dontcare-border-color);
 }
 
 .td-signal-highz {
-    border-top: var(--border-weight) solid black;
+    border-top: var(--border-weight) solid var(--signal-highz-border-color);
     height: 0;
 }
 
@@ -90,14 +105,15 @@
 }
 
 .td-signal-low + .td-signal-high::before {
-    border-left: var(--border-weight) solid black;
+    border-left: var(--border-weight) solid var(--signal-general-border-color);
 }
 
 .td-signal-high {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    border-top: var(--border-weight) solid black;
+    background-color: var(--signal-general-color);
+    border-top: var(--border-weight) solid var(--signal-general-border-color);
     height: var(--cycle-height);
 }
 
@@ -109,7 +125,7 @@
 }
 
 .td-signal-low + .td-signal-high::after {
-    border-left: var(--border-weight) solid black;
+    border-left: var(--border-weight) solid var(--signal-general-border-color);
 }
 
 .td-signal-low::before {
@@ -120,14 +136,14 @@
 }
 
 .td-signal-high + .td-signal-low::before {
-    border-left: var(--border-weight) solid black;
+    border-left: var(--border-weight) solid var(--signal-general-border-color);
 }
 
 .td-signal-low {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    border-bottom: var(--border-weight) solid black;
+    border-bottom: var(--border-weight) solid var(--signal-general-border-color);
     height: var(--cycle-height);
 }
 
@@ -139,7 +155,7 @@
 }
 
 .td-signal-high + .td-signal-low::after {
-    border-left: var(--border-weight) solid black;
+    border-left: var(--border-weight) solid var(--signal-general-border-color);
 }
 
 .td-signal-smooth-after {
