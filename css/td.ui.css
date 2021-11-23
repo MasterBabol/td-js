@@ -48,7 +48,7 @@
     margin: var(--space-between-signals);
     height: var(--cycle-height);
     align-items: center;
-    justify-content: right;
+    justify-content: flex-end;
 }
 
 .td-signal_name_detail {
