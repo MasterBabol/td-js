@@ -242,6 +242,28 @@ function Td(targetDom, config) {
         }
     });
 
+    let cursorMoveEventHandler = (ev) => {
+        let rect = ev.currentTarget.getBoundingClientRect();
+        let offsetX = ev.currentTarget.scrollLeft + ev.clientX - rect.left;
+        this.setCursorPosByPx(offsetX);
+    };
+
+    let mouseDowned = false;
+    signalContentsContainerWrapper.addEventListener('mousedown', (ev) => {
+        mouseDowned = true;
+    });
+    signalContentsContainerWrapper.addEventListener('mouseup', (ev) => {
+        mouseDowned = false;
+    });
+
+    signalContentsContainerWrapper.addEventListener('mousemove', (ev) => {
+        if (mouseDowned) {
+            let rect = ev.currentTarget.getBoundingClientRect();
+            let offsetX = ev.currentTarget.scrollLeft + ev.clientX - rect.left;
+            this.setCursorPosByPx(offsetX);
+        }
+    });
+
     signalContentsContainerWrapper.addEventListener('click', (ev) => {
         let rect = ev.currentTarget.getBoundingClientRect();
         let offsetX = ev.currentTarget.scrollLeft + ev.clientX - rect.left;
