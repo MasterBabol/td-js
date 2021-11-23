@@ -258,16 +258,12 @@ function Td(targetDom, config) {
 
     signalContentsContainerWrapper.addEventListener('mousemove', (ev) => {
         if (mouseDowned) {
-            let rect = ev.currentTarget.getBoundingClientRect();
-            let offsetX = ev.currentTarget.scrollLeft + ev.clientX - rect.left;
-            this.setCursorPosByPx(offsetX);
+            cursorMoveEventHandler(ev);
         }
     });
 
     signalContentsContainerWrapper.addEventListener('click', (ev) => {
-        let rect = ev.currentTarget.getBoundingClientRect();
-        let offsetX = ev.currentTarget.scrollLeft + ev.clientX - rect.left;
-        this.setCursorPosByPx(offsetX);
+        cursorMoveEventHandler(ev);
     });
 
     signalContentsContainerWrapper.addEventListener('mousewheel', (ev) => {
